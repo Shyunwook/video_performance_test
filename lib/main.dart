@@ -29,40 +29,80 @@ class VvideoPlayerTestState extends State<VideoPlayerTest> {
 
   @override
   void initState() {
-    controller = VideoPlayerController.asset('asset/screw.mp4');
-    controller?.initialize().then((_) {
-      setState(() {
-        videoDuration = controller!.value.duration;
-      });
-    });
-
     super.initState();
+    initializePlayer();
+  }
+
+  void initializePlayer() async {
+    controller = VideoPlayerController.asset(
+      'asset/display-rotate_key_no_audio.mp4',
+    );
+    await controller!.initialize();
+
+    setState(() {
+      videoDuration = controller!.value.duration;
+      print('[bobby] ${videoDuration.inMilliseconds}');
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    if (controller == null) SizedBox.shrink();
+    if (controller == null || !controller!.value.isInitialized) {
+      return const Center(child: CircularProgressIndicator());
+    }
 
     return Stack(
       children: [
         VideoPlayer(controller!),
         GestureDetector(
-          onHorizontalDragUpdate: (details) {
-            distance += details.delta.dx;
-            distance = distance.clamp(0, 200);
+          onTapDown: (details) async {
+            if (controller == null) return;
 
-            final sensitivity = videoDuration.inMilliseconds / 200;
-            final currentTime = sensitivity * distance;
-
-            if (!shouldSkipFrame()) {
-              print('[BOBBY] $currentTime');
-              controller?.seekTo(Duration(milliseconds: currentTime.toInt()));
-            }
+            final downTime = DateTime.now();
+            await controller!.seekTo(Duration(milliseconds: 2200)).then((_) {
+              print('haha bobby');
+            });
+            print(
+              '[Bobby] seekTo took ${DateTime.now().difference(downTime).inMilliseconds}ms',
+            );
           },
-          child: Container(color: Colors.red.withAlpha(50)),
+          onTapUp: (details) {
+            controller?.seekTo(Duration(milliseconds: 0));
+          },
+          // onHorizontalDragUpdate: (details) async {
+          //   distance += details.delta.dx;
+          //   distance = distance.clamp(0, 200);
+
+          //   final sensitivity = videoDuration.inMilliseconds / 200;
+          //   final currentTime = sensitivity * distance;
+
+          //   if (!shouldSkipFrame()) {
+          //     if (currentTime == videoDuration.inMilliseconds.toDouble()) {
+          //       print('[BOBBY] $currentTime');
+          //       // return;
+          //     }
+          //     controller?.seekTo(Duration(milliseconds: currentTime.toInt())).then((
+          //       _,
+          //     ) {
+          //       print(
+          //         'BOBBY ${currentTime == videoDuration.inMilliseconds.toDouble()}',
+          //       );
+          //       if (currentTime == videoDuration.inMilliseconds.toDouble()) {
+          //         print('[BOBBY] SeekTo Complete');
+          //         return;
+          //       }
+          //     });
+          //   }
+          // },
         ),
       ],
     );
+  }
+
+  @override
+  void dispose() {
+    controller?.dispose();
+    super.dispose();
   }
 
   bool shouldSkipFrame() {
