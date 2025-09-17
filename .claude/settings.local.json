@@ -5,7 +5,8 @@
       "WebFetch(domain:github.com)",
       "WebFetch(domain:stackoverflow.com)",
       "Bash(flutter pub:*)",
-      "Bash(flutter clean:*)"
+      "Bash(flutter clean:*)",
+      "Bash(flutter config:*)"
     ],
     "deny": [],
     "ask": []
