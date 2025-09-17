@@ -57,7 +57,7 @@ class _MediaKitTestState extends State<MediaKitTest> {
   Player? player;
   VideoController? videoController;
   late Duration videoDuration;
-  double distance = 0;
+  double distance = 200;
   double lastFrameTime = 0;
 
   @override
@@ -117,10 +117,11 @@ class _MediaKitTestState extends State<MediaKitTest> {
           },
           onHorizontalDragUpdate: (details) async {
             distance += details.delta.dx;
+
             distance = distance.clamp(0, 200);
 
             final sensitivity = videoDuration.inMilliseconds / 200;
-            final currentTime = sensitivity * distance;
+            final currentTime = sensitivity * (200 - distance);
 
             if (!shouldSkipFrame()) {
               if (currentTime == videoDuration.inMilliseconds.toDouble()) {
@@ -190,7 +191,7 @@ class VideoPlayerTest extends StatefulWidget {
 class _VideoPlayerTestState extends State<VideoPlayerTest> {
   VideoPlayerController? controller;
   late Duration videoDuration;
-  double distance = 0;
+  double distance = 200;
   double lastFrameTime = 0;
 
   @override
@@ -238,7 +239,7 @@ class _VideoPlayerTestState extends State<VideoPlayerTest> {
             distance = distance.clamp(0, 200);
 
             final sensitivity = videoDuration.inMilliseconds / 200;
-            final currentTime = sensitivity * distance;
+            final currentTime = sensitivity * (200 - distance);
 
             if (!shouldSkipFrame()) {
               if (currentTime == videoDuration.inMilliseconds.toDouble()) {
