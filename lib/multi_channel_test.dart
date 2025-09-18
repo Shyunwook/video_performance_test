@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 import 'package:video_player/video_player.dart';
@@ -92,7 +93,7 @@ class _MultiChannelTestScreenState extends State<MultiChannelTestScreen>
           onPressed: () => context.go('/'),
         ),
         title: Text(
-          _useMediaKit ? 'media_kit (libmpv)' : 'video_player (ExoPlayer)',
+          _useMediaKit && !kIsWeb ? 'media_kit (libmpv)' : 'video_player (${kIsWeb ? 'HTML5' : 'ExoPlayer'})',
         ),
         backgroundColor: _useMediaKit ? Colors.green : Colors.blue,
         foregroundColor: Colors.white,
@@ -108,7 +109,7 @@ class _MultiChannelTestScreenState extends State<MultiChannelTestScreen>
       body: Column(
         children: [
           Expanded(
-            child: _useMediaKit
+            child: _useMediaKit && !kIsWeb
                 ? const MediaKitVideoTest()
                 : const VideoPlayerVideoTest(),
           ),
@@ -117,9 +118,9 @@ class _MultiChannelTestScreenState extends State<MultiChannelTestScreen>
             child: Column(
               children: [
                 Text(
-                  _useMediaKit
+                  _useMediaKit && !kIsWeb
                       ? '🟢 Testing media_kit + just_audio'
-                      : '🔵 Testing video_player + just_audio',
+                      : '🔵 Testing video_player + just_audio${kIsWeb ? ' (Web)' : ''}',
                   style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 8),
@@ -160,7 +161,11 @@ class _MediaKitVideoTestState extends State<MediaKitVideoTest> {
     try {
       MediaKit.ensureInitialized();
 
-      _player = Player();
+      _player = Player(
+        configuration: const PlayerConfiguration(
+          title: 'Video Performance Test',
+        ),
+      );
       _videoController = VideoController(_player!);
 
       _player!.stream.buffering.listen((isBuffering) {
@@ -189,7 +194,6 @@ class _MediaKitVideoTestState extends State<MediaKitVideoTest> {
       });
 
       await _player!.open(Media('asset:///asset/poop_explorers.mp4'));
-      await _player!.pause();
     } catch (e) {
       if (mounted) {
         setState(() {
