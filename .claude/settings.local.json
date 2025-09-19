@@ -8,7 +8,10 @@
       "Bash(flutter clean:*)",
       "Bash(flutter config:*)",
       "Bash(flutter run:*)",
-      "Bash(flutter:*)"
+      "Bash(flutter:*)",
+      "Bash(ffprobe:*)",
+      "Bash(ffmpeg:*)",
+      "WebFetch(domain:webkit.org)"
     ],
     "deny": [],
     "ask": []
